@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
 import SongInTheCity from './SongInTheCity'
+import ToutDoucement from './ToutDoucement'
 // var songABI = require ("./SongForTheCityABI.js");
 // var songContract = web3.eth.contract(songforthecity);
 
@@ -54,6 +55,7 @@ class App extends Component {
           <li>Address : {this.state.address}</li>
         </ul>
         <SongInTheCity web3 = {this.web3} address = {this.state.address}></SongInTheCity>
+        <ToutDoucement web3 = {this.web3} address = {this.state.address}></ToutDoucement>
       </div>
     );
   }

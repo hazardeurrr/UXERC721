@@ -31,8 +31,10 @@ class SongInTheCity extends Component {
   }
 
   async creditToken(){
-    
-    await this.state.contract.methods.claimAToken().call()    
+    console.log(this.props.address)
+    this.props.web3.eth.defaultAccount = this.props.web3.eth.accounts[0]; // = this.props.address  ou  web3.eth.accounts[0] ???
+    //console.log(this.props.web3.eth.accounts[0])   is undefined ='(
+   // await this.state.contract.methods.claimAToken().call()   
   }
 
   componentDidMount() {
@@ -43,11 +45,12 @@ class SongInTheCity extends Component {
     return (
       <div>
         <h2>Song For The City</h2>
-        <p>{this.state.contractName}</p>
-        <p>{this.state.totalNumberToken}</p>
+        <p>Nom du contrat : {this.state.contractName}</p>
+        <p>Nombre total de tokens : {this.state.totalNumberToken}</p>
         <p>{this.state.URIContent}</p>
 
         <Button variant="outlined" onClick={() => this.creditToken()}>GET TOKEN</Button>
+        <p>{this.props.address}</p>
       </div>
     );
   }

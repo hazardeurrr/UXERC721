@@ -53,7 +53,7 @@ class App extends Component {
           <li>Last Block Number : {this.state.lastBlockNumber}</li>
           <li>Address : {this.state.address}</li>
         </ul>
-        <SongInTheCity web3 = {this.web3}></SongInTheCity>
+        <SongInTheCity web3 = {this.web3} address = {this.state.address}></SongInTheCity>
       </div>
     );
   }

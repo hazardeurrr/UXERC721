@@ -1,12 +1,15 @@
-import React, { Component } from 'react';
+import React, { Component} from 'react';
 import abi from './SongInTheCityABI';
+import TokenGrid from './TokenGrid';
 import Button from '@material-ui/core/Button';
+import Avatar from '@material-ui/core/Avatar';
+import { makeStyles } from '@material-ui/core/styles';
 
 
 class SongInTheCity extends Component {
   constructor(props) {
     super()
-    this.state = {contract: undefined, contractName: undefined, totalNumberToken: undefined, URIContent: undefined}
+    this.state = {contract: undefined, contractName: undefined, totalNumberToken: undefined, URIContent: undefined, nft: {url: undefined, name: undefined, description: undefined }, token: {txHash: undefined, confirmationNumber: undefined}, dataTokensOfOwner: undefined}  
   }
 
   async componentWillMount() {
@@ -25,16 +28,40 @@ class SongInTheCity extends Component {
       .then(res => res.json())
       .then(data => {
         console.log(data)
-        this.setState({ URIContent: data });
+        console.log(Object.keys(data.properties))
+        console.log(data.properties.image.description)
+        this.setState({ nft: {url: data.properties.image.description, name: data.properties.name.description, description: data.properties.description.description} });
       })
     })
   }
 
   async creditToken(){
     console.log(this.props.address)
-    this.props.web3.eth.defaultAccount = this.props.web3.eth.accounts[0]; // = this.props.address  ou  web3.eth.accounts[0] ???
+    console.log()
+    //this.props.web3.eth.defaultAccount = this.props.web3.eth.accounts[0]; // = this.props.address  ou  web3.eth.accounts[0] ???
     //console.log(this.props.web3.eth.accounts[0])   is undefined ='(
-   // await this.state.contract.methods.claimAToken().call()   
+    this.state.contract.methods.claimAToken().send({from : this.props.address[0]})
+    .on('transactionHash', function(hash){
+      this.setState({token: {txHash: hash}})
+    }.bind(this))
+    .on('confirmation', function(confirmationNumber, receipt) {
+      this.setState({token: {confirmationNumber: confirmationNumber}})
+      console.log(confirmationNumber)
+    }.bind(this))
+    .on('receipt', function(receipt){
+        console.log(receipt);
+    })
+  }
+
+  async displayToken(){
+    const nbTokens = this.state.contract.methods.balanceOf(this.props.address[0])
+    for (var i = 0; i <= nbTokens; i++) {
+      this.displayToken(this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i));
+    }
+  }
+
+  displayToken(){
+
   }
 
   componentDidMount() {
@@ -47,12 +74,14 @@ class SongInTheCity extends Component {
         <h2>Song For The City</h2>
         <p>Nom du contrat : {this.state.contractName}</p>
         <p>Nombre total de tokens : {this.state.totalNumberToken}</p>
-        <p>{this.state.URIContent}</p>
-
+        <Avatar alt="Remy Sharp" src={this.state.nft.url} />
         <Button variant="outlined" onClick={() => this.creditToken()}>GET TOKEN</Button>
-        <p>{this.props.address}</p>
+        <p>Hash : {this.state.token.txHash}</p>
+        <p>Confirmations : {this.state.token.confirmationNumber}</p>
+        <TokenGrid tileData={this.state.dataTokensOfOwner}></TokenGrid>
       </div>
     );
   }
 }
+
 export default SongInTheCity;

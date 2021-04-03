@@ -17,7 +17,7 @@ class App extends Component {
 
     constructor(props) {
         super(props)
-        this.state = {address: undefined, receiver: undefined, tokenId: undefined, contractName: '' }
+        this.state = {address: undefined, receiver: 'this will be something unique', tokenId: undefined, contractName: '' }
     }
   async componentWillMount() {
   }
@@ -25,34 +25,45 @@ class App extends Component {
   async handleTransfer(e) {
         e.preventDefault()
         console.log('submited')
+        console.log('contract name :',this.state.contractName)
+        console.log(e.target.receiver.value)
+        console.log(e.target.tokenId.value)
         this.setState({receiver: e.target.receiver.value})
         this.setState({tokenId: e.target.tokenId.value})
-        if (this.state.contractName !== 'Tout Doucement' || this.state.contractName !== 'Song for the City') {
+        if (this.state.contractName !== 'Tout Doucement' && this.state.contractName !== 'Song for the City') {
             window.alert('Veuillez selectionner un contrat valide')
             return
         }
-        // const currentContract  = this.loadContract(this.state.contractName)
-        // currentContract.methods.TransferFrom(this.state.address, this.state.receiver, this.state.tokenId).send({from: this.state.address})
+        const currentContract  = this.loadContract(this.state.contractName)
+        console.log(currentContract)
+        // currentContract.methods.TransferFrom(this.props.address[0], this.state.receiver, this.state.tokenId).send({from: this.state.address})
   }
 
     async loadContract(contractName) {
-    if (contractName === 'Tout Doucement') {
-        // Loading Tout Doucement contract
-        return await new this.props.web3.eth.Contract(abiTD.abi, '0x89150a0325ecc830a2304a44de98551051b4f466')
-    }
-    else if (contractName === 'Song for the City') {
-        // Loading Song For The City contract
-        return await new this.props.web3.eth.Contract(abiSFTC.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
-    }
-    else {
-        window.alert('Veuillez selectionner un contrat valide')
-        return
-    }
+        let instance;
+        if (contractName === 'Tout Doucement') {
+            // Loading Tout Doucement contract
+            instance = await new this.props.web3.eth.Contract(abiTD.abi, '0x89150a0325ecc830a2304a44de98551051b4f466')
+            return instance
+        }
+        else if (contractName === 'Song for the City') {
+            // Loading Song For The City contract
+            instance = await new this.props.web3.eth.Contract(abiSFTC.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
+            return instance
+        }
+        else {
+            window.alert('Veuillez selectionner un contrat valide')
+            return
+        }
   }
 
 
-  handleChange(value) {
-    this.setState({contractName: value})
+  handleChange(e) {
+      console.log('value :',)
+      let contract = e.target.value
+      console.log('in state :',this.state.contractName)
+      this.setState({contractName: contract})
+      console.log('in state after setstate:',this.state.contractName)
   };
 
   render() {
@@ -63,7 +74,7 @@ class App extends Component {
       <div>
           <Card style={{width: "35%", textAlign: 'center',margin: '2rem auto', padding: '2rem', boxShadow: "0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12)"}}>
                 <Typography variant="h3" component="h4" gutterBottom >Transférez vos tokens</Typography>
-                <form onSubmit={this.handleTransfer}>
+                <form onSubmit={this.handleTransfer.bind(this)}>
                     <FormGroup>
                         <FormControl >
                             <InputLabel id="contractName">Nom du contrat</InputLabel>
@@ -71,7 +82,7 @@ class App extends Component {
                             labelId="contractName"
                             id="contract"
                             value={contractName}
-                            onChange={event => this.handleChange(event.target.value)}
+                            onChange={this.handleChange.bind(this)}
                             >
                             <MenuItem value='Tout Doucement'>Tout Doucement</MenuItem>
                             <MenuItem value='Song for the City'>Song for the City</MenuItem>

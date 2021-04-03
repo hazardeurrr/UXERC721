@@ -53,7 +53,7 @@ export default function TokenGrid({ tileData }) {
        author: 'author',
       }
     ];*/
-
+  
   return (
     <div className={classes.root}>
       <GridList cellHeight={180} className={classes.gridList}>

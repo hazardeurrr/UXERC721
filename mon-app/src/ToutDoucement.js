@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import abi from './ToutDoucementABI';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
+import TokenGrid from './TokenGrid';
 
 class ToutDoucement extends Component {
   constructor(props) {
     super()
-    this.state = {contract: undefined, contractName: undefined, totalNumberToken: undefined, URIContent: undefined, token: {txHash: undefined, confirmationNumber: undefined}}
+    this.state = {contract: undefined, contractName: undefined, totalNumberToken: undefined, URIContent: undefined, token: {txHash: undefined, confirmationNumber: undefined}, tileData: [], tokensOwned: []}
   }
 
   async componentWillMount() {
@@ -32,9 +33,55 @@ class ToutDoucement extends Component {
     }) // methods. ???
   }
 
-  componentDidMount() {
-
+  async componentDidMount() {
+    await this.displayToken();
   }
+
+  async displayToken(){
+    const instance = await new this.props.web3.eth.Contract(abi.abi, '0x89150a0325ecc830a2304a44de98551051b4f466')
+    console.log('indisplay token :',instance)
+    let nbTokens = await instance.methods.balanceOf(this.props.address[0]).call()
+    console.log(nbTokens)
+    let tid = undefined
+    for (var i = 0; i < nbTokens; i++) {
+      tid = await this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i).call()
+      console.log(tid)
+      this.setState({ tokensOwned: [...this.state.tokensOwned, await this.displayInfos(tid)] })
+      //this.state.tokensOwned.push(this.displayInfos(this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i)));
+      //this.setState({tokensOwned: [...this.state.tokensOwned, this.displayInfos(i)]})
+    }
+    this.preRender()
+  }
+
+  preRender() {
+    this.state.tokensOwned.forEach(elt => {
+      this.setState({ tileData: [...this.state.tileData, {img: elt.img, title: elt.name, author: elt.tokenId}]})
+    })
+    console.log("Tout doucement TileData : " + this.state.tileData)
+  }
+
+  async displayInfos(tokenId){
+    console.log('TOKEN ID', tokenId)
+    let img = ''
+    let name = ''
+    const instance = await new this.props.web3.eth.Contract(abi.abi, '0x89150a0325ecc830a2304a44de98551051b4f466')
+  //  let symbol = await this.state.contract.methods.symbol().call()
+    let promise = instance.methods.tokenURI(tokenId).call().then(uri => {
+      let promise = fetch('https://cors-anywhere.herokuapp.com/' + uri)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data.properties.name.description)
+        img = data.properties.image.description
+        name = data.properties.name.description
+        const token = {tokenId, name, img}
+        return token
+      })
+      return promise
+    })
+    return promise
+  }
+
+
 
   render() {
     return (
@@ -47,6 +94,7 @@ class ToutDoucement extends Component {
         <p>Hash : {this.state.token.txHash}</p>
         <p>Confirmations : {this.state.token.confirmationNumber}</p>
         </Card>
+        <TokenGrid tileData={this.state.tileData}></TokenGrid>
       </div>
     );
   }

@@ -57,6 +57,10 @@ class App extends Component {
 
 
   render() {
+    // If the state.address in the 
+    if (this.state.address === undefined) {
+      return null
+    }
     return (
       <div>
         <Transfer></Transfer>
@@ -64,7 +68,7 @@ class App extends Component {
           <div style={{textAlign: 'center'}}>
             <Typography variant="h5" component="h6" gutterBottom >Infos de Métamask</Typography>
             <Typography variant="h5" component="h6" gutterBottom >Connecté ?</Typography>
-            <Typography variant="body1" component="body1" gutterBottom style={{color: this.state.isConnected ? 'green':'red'}}>{this.state.isConnected ? 'Connecté à Metamask':'Pas connecté'}</Typography>
+            <Typography variant="body1" gutterBottom style={{color: this.state.isConnected ? 'green':'red'}}>{this.state.isConnected ? 'Connecté à Metamask':'Pas connecté'}</Typography>
             <Typography variant="h5" component="h6" gutterBottom >Infos</Typography>
           </div>
           <ul style={{listStyle: 'none'}}>

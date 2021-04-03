@@ -69,22 +69,17 @@ class SongInTheCity extends Component {
     let nbTokens = await instance.methods.balanceOf(this.props.address[0]).call()
     console.log(nbTokens)
     let tid = undefined
-    let t = undefined
     for (var i = 0; i < nbTokens; i++) {
-      console.log(i)
       tid = await this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i).call()
       console.log(tid)
-      t = await this.displayInfos(tid)
-      console.log('token from display infos', t)
+      this.setState({ tokensOwned: [...this.state.tokensOwned, await this.displayInfos(tid)] })
       //this.state.tokensOwned.push(this.displayInfos(this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i)));
-      this.setState({ tokensOwned: [...this.state.tokensOwned, t] })
       //this.setState({tokensOwned: [...this.state.tokensOwned, this.displayInfos(i)]})
     }
-    
     this.preRender()
   }
 
-  async preRender() {
+  preRender() {
     this.state.tokensOwned.forEach(elt => {
       this.setState({ tileData: [...this.state.tileData, {img: elt.img, title: elt.name, author: elt.tokenId}]})
     })
@@ -96,20 +91,20 @@ class SongInTheCity extends Component {
     let img = ''
     let name = ''
     const instance = await new this.props.web3.eth.Contract(abi.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
-    console.log(instance)
   //  let symbol = await this.state.contract.methods.symbol().call()
-    instance.methods.tokenURI(tokenId).call().then(uri => {
-      fetch('https://cors-anywhere.herokuapp.com/' + uri)
+    let promise = instance.methods.tokenURI(tokenId).call().then(uri => {
+      let promise = fetch('https://cors-anywhere.herokuapp.com/' + uri)
       .then(res => res.json())
       .then(data => {
         console.log(data.properties.name.description)
         img = data.properties.image.description
         name = data.properties.name.description
         const token = {tokenId, name, img}
-        console.log(token)
         return token
       })
+      return promise
     })
+    return promise
   }
 
 

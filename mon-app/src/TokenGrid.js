@@ -42,17 +42,17 @@ const useStyles = makeStyles((theme) => ({
  * ];
  */
 
-export default function TitlebarGridList() {
+export default function TokenGrid({ tileData }) {
 
   const classes = useStyles();
 
-  const tileData = [
+  /*const tileData = [
       {
         img: 'http://www.victoire-oberkampf.fr/NFT-Workshop/SongForACity.jpeg',
         title: 'Image',
        author: 'author',
       }
-    ];
+    ];*/
 
   return (
     <div className={classes.root}>

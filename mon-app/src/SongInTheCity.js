@@ -8,17 +8,25 @@ import Card from '@material-ui/core/Card';
 
 class SongInTheCity extends Component {
   constructor(props) {
-    super()
-    this.state = {contract: undefined, contractName: undefined, totalNumberToken: undefined, URIContent: undefined, nft: {url: undefined, name: undefined, description: undefined }, token: {txHash: undefined, confirmationNumber: undefined}, dataTokensOfOwner: undefined}  
-    this.tokens = [];
-    this.tokenHTML = [];
+    super(props)
+    this.props = props
+    this.state = {contract: undefined, contractName: undefined, totalNumberToken: undefined, URIContent: undefined, nft: {url: undefined, name: undefined, description: undefined }, token: {txHash: undefined, confirmationNumber: undefined},
+  tileData: [], tokensOwned: []}  
   }
 
   async componentWillMount() {
       const instance = await new this.props.web3.eth.Contract(abi.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
       this.setState({contract: instance})
-      console.log(instance)
+      console.log('song in the city instance : ',instance)
       this.infosFromContract(this.state.contract)
+
+  }
+
+  async componentDidMount() {
+    console.log('address in did mount arr : ', this.props.address)
+    console.log('address in did mount : ', this.props.address[0])
+    await this.displayToken();
+
   }
 
   async infosFromContract(instance) {
@@ -56,31 +64,55 @@ class SongInTheCity extends Component {
   }
 
   async displayToken(){
-    const nbTokens = await this.state.contract.methods.balanceOf(this.props.address[0])
+    const instance = await new this.props.web3.eth.Contract(abi.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
+    console.log('indisplay token :',instance)
+    let nbTokens = await instance.methods.balanceOf(this.props.address[0]).call()
+    console.log(nbTokens)
+    let tid = undefined
+    let t = undefined
     for (var i = 0; i < nbTokens; i++) {
-      this.tokens.push(this.displayInfos(this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i)));
-      this.preRender()
+      console.log(i)
+      tid = await this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i).call()
+      console.log(tid)
+      t = await this.displayInfos(tid)
+      console.log('token from display infos', t)
+      //this.state.tokensOwned.push(this.displayInfos(this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i)));
+      this.setState({ tokensOwned: [...this.state.tokensOwned, t] })
+      //this.setState({tokensOwned: [...this.state.tokensOwned, this.displayInfos(i)]})
     }
+    
+    this.preRender()
   }
 
-  preRender() {
-    this.tokens.forEach(elt => {
-      this.tokenHTML.push(<TokenGrid tileData={elt}></TokenGrid>)
+  async preRender() {
+    this.state.tokensOwned.forEach(elt => {
+      this.setState({ tileData: [...this.state.tileData, {img: elt.img, title: elt.name, author: elt.tokenId}]})
     })
+    console.log(this.state.tileData)
   }
 
   async displayInfos(tokenId){
-    console.log(tokenId)
-    let name = await this.state.contract.methods.name(this.props.address[0], tokenId)
-    let symbol = await this.state.contract.methods.symbol().call()
-    let tokenURI = await this.state.contract.methods.tokenURI(tokenId).call()
-    const token = {tokenId, name, symbol, tokenURI}
-    return token
+    console.log('TOKEN ID', tokenId)
+    let img = ''
+    let name = ''
+    const instance = await new this.props.web3.eth.Contract(abi.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
+    console.log(instance)
+  //  let symbol = await this.state.contract.methods.symbol().call()
+    instance.methods.tokenURI(tokenId).call().then(uri => {
+      fetch('https://cors-anywhere.herokuapp.com/' + uri)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data.properties.name.description)
+        img = data.properties.image.description
+        name = data.properties.name.description
+        const token = {tokenId, name, img}
+        console.log(token)
+        return token
+      })
+    })
   }
 
-  async componentDidMount() {
-    // this.displayToken();
-  }
+
 
   render() {
     return (
@@ -93,9 +125,8 @@ class SongInTheCity extends Component {
         <Button variant="contained" color="primary" onClick={() => this.creditToken()}>GET TOKEN</Button>
         <p>Hash : {this.state.token.txHash}</p>
         <p>Confirmations : {this.state.token.confirmationNumber}</p>
-        {this.tokenHTML}
       </Card>
-      <TokenGrid tileData={this.state.dataTokensOfOwner}></TokenGrid>
+      <TokenGrid tileData={this.state.tileData}></TokenGrid>
       </div>
     );
   }

@@ -3,13 +3,15 @@ import abi from './SongInTheCityABI';
 import TokenGrid from './TokenGrid';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
-import { makeStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
 
 
 class SongInTheCity extends Component {
   constructor(props) {
     super()
     this.state = {contract: undefined, contractName: undefined, totalNumberToken: undefined, URIContent: undefined, nft: {url: undefined, name: undefined, description: undefined }, token: {txHash: undefined, confirmationNumber: undefined}, dataTokensOfOwner: undefined}  
+    this.tokens = [];
+    this.tokenHTML = [];
   }
 
   async componentWillMount() {
@@ -54,31 +56,46 @@ class SongInTheCity extends Component {
   }
 
   async displayToken(){
-    const nbTokens = this.state.contract.methods.balanceOf(this.props.address[0])
-    for (var i = 0; i <= nbTokens; i++) {
-      this.displayToken(this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i));
+    const nbTokens = await this.state.contract.methods.balanceOf(this.props.address[0])
+    for (var i = 0; i < nbTokens; i++) {
+      this.tokens.push(this.displayInfos(this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i)));
+      this.preRender()
     }
   }
 
-  displayToken(){
-
+  preRender() {
+    this.tokens.forEach(elt => {
+      this.tokenHTML.push(<TokenGrid tileData={elt}></TokenGrid>)
+    })
   }
 
-  componentDidMount() {
+  async displayInfos(tokenId){
+    console.log(tokenId)
+    let name = await this.state.contract.methods.name(this.props.address[0], tokenId)
+    let symbol = await this.state.contract.methods.symbol().call()
+    let tokenURI = await this.state.contract.methods.tokenURI(tokenId).call()
+    const token = {tokenId, name, symbol, tokenURI}
+    return token
+  }
 
+  async componentDidMount() {
+    // this.displayToken();
   }
 
   render() {
     return (
       <div>
+      <Card style={{width: "35%", textAlign: 'center',margin: '2rem auto', padding: '2rem', boxShadow: "0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12)"}}>
         <h2>Song For The City</h2>
         <p>Nom du contrat : {this.state.contractName}</p>
         <p>Nombre total de tokens : {this.state.totalNumberToken}</p>
         <Avatar alt="Remy Sharp" src={this.state.nft.url} />
-        <Button variant="outlined" onClick={() => this.creditToken()}>GET TOKEN</Button>
+        <Button variant="contained" color="primary" onClick={() => this.creditToken()}>GET TOKEN</Button>
         <p>Hash : {this.state.token.txHash}</p>
         <p>Confirmations : {this.state.token.confirmationNumber}</p>
-        <TokenGrid tileData={this.state.dataTokensOfOwner}></TokenGrid>
+        {this.tokenHTML}
+      </Card>
+      <TokenGrid tileData={this.state.dataTokensOfOwner}></TokenGrid>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import abi from './ToutDoucementABI';
 import Button from '@material-ui/core/Button';
-
+import Card from '@material-ui/core/Card';
 
 class ToutDoucement extends Component {
   constructor(props) {
@@ -39,11 +39,14 @@ class ToutDoucement extends Component {
   render() {
     return (
       <div>
-        <h2>Tout Doucement</h2>        
+        <Card style={{width: "35%", textAlign: 'center',margin: '2rem auto', padding: '2rem', boxShadow: "0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12)"}}>
 
-        <Button variant="outlined" onClick={() => this.buyToken()}>BUY TOKEN (0.1ETH)</Button>
+        <h2>Tout Doucement</h2>        
+      
+        <Button variant="contained" color="primary" onClick={() => this.buyToken()}>BUY TOKEN (0.1ETH)</Button>
         <p>Hash : {this.state.token.txHash}</p>
         <p>Confirmations : {this.state.token.confirmationNumber}</p>
+        </Card>
       </div>
     );
   }

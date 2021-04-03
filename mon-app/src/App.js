@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
 import SongInTheCity from './SongInTheCity'
+import Transfer from './Transfer'
 import ToutDoucement from './ToutDoucement'
+import Card from '@material-ui/core/Card';
+import Typography from '@material-ui/core/Typography';
+
 // var songABI = require ("./SongForTheCityABI.js");
 // var songContract = web3.eth.contract(songforthecity);
 
@@ -15,7 +19,7 @@ class App extends Component {
 
   async loadWeb3() {
     console.log('window eth :',window.ethereum)
-    if (window.ethereum !== undefined) {
+    if (window.ethereum.isConnected) {
       this.web3 = new Web3(window.ethereum)
       await window.ethereum.enable()
       this.setState({isConnected: true});
@@ -40,20 +44,39 @@ class App extends Component {
     window.ethereum.on('accountsChanged', (accounts) => {
       this.setState({address: accounts})
     });
+    window.ethereum.on('chainChanged', (chainId) => {
+      this.setState({chainId: this.web3.utils.hexToNumber(chainId)})
+    });
+    window.ethereum.on('disconnect', () => {
+      this.setState({isConnected: false})
+    })
+    window.ethereum.on('connect', () => {
+      this.setState({isConnected: true})
+    })
   }
 
 
   render() {
     return (
       <div>
-        <h2>Is connected?:</h2><br/>
-        {this.state.isConnected ? 'Connected to Metamask':'Not Connected'}
-        <h2>Infos</h2>
-        <ul>
-          <li>Chain Id : {this.state.chainId}</li>
-          <li>Last Block Number : {this.state.lastBlockNumber}</li>
-          <li>Address : {this.state.address}</li>
-        </ul>
+        <Transfer></Transfer>
+        <Card style={{width: "35%",margin: '2rem auto', padding: '2rem', boxShadow: "0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12)"}}>
+          <div style={{textAlign: 'center'}}>
+            <Typography variant="h5" component="h6" gutterBottom >Infos de Métamask</Typography>
+            <Typography variant="h5" component="h6" gutterBottom >Connecté ?</Typography>
+            <Typography variant="body1" component="body1" gutterBottom style={{color: this.state.isConnected ? 'green':'red'}}>{this.state.isConnected ? 'Connecté à Metamask':'Pas connecté'}</Typography>
+            <Typography variant="h5" component="h6" gutterBottom >Infos</Typography>
+          </div>
+          <ul style={{listStyle: 'none'}}>
+            <hr></hr>
+            <li>Chain Id : {this.state.chainId}</li>
+            <hr></hr>
+            <li>Last Block Number : {this.state.lastBlockNumber}</li>
+            <hr></hr>
+            <li>Address : {this.state.address}</li>
+            <hr></hr>
+          </ul>
+        </Card>
         <SongInTheCity web3 = {this.web3} address = {this.state.address}></SongInTheCity>
         <ToutDoucement web3 = {this.web3} address = {this.state.address}></ToutDoucement>
       </div>

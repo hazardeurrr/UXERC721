@@ -38,7 +38,7 @@ class App extends Component {
   }
 
   async setUpAccount() {
-    this.setState({chainId: this.web3.utils.hexToNumber(window.ethereum.chainId)})
+    this.setState({chainId: await this.web3.utils.hexToNumber(window.ethereum.chainId)})
     this.setState({lastBlockNumber: await this.web3.eth.getBlockNumber()})
     this.setState({address: await this.web3.eth.getAccounts()})
     window.ethereum.on('accountsChanged', (accounts) => {

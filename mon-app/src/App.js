@@ -63,7 +63,6 @@ class App extends Component {
     }
     return (
       <div>
-        <Transfer web3 = {this.web3} address = {this.state.address}></Transfer>
         <Card style={{width: "35%",margin: '2rem auto', padding: '2rem', boxShadow: "0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12)"}}>
           <div style={{textAlign: 'center'}}>
             <Typography variant="h5" component="h6" gutterBottom >Infos de Métamask</Typography>
@@ -83,6 +82,7 @@ class App extends Component {
         </Card>
         <SongInTheCity web3 = {this.web3} address = {this.state.address}></SongInTheCity>
         <ToutDoucement web3 = {this.web3} address = {this.state.address}></ToutDoucement>
+        <Transfer web3 = {this.web3} address = {this.state.address}></Transfer>
       </div>
     );
   }

@@ -2,7 +2,6 @@ import React, { Component} from 'react';
 import abi from './SongInTheCityABI';
 import TokenGrid from './TokenGrid';
 import Button from '@material-ui/core/Button';
-import Avatar from '@material-ui/core/Avatar';
 import Card from '@material-ui/core/Card';
 
 
@@ -116,7 +115,8 @@ class SongInTheCity extends Component {
         <h2>Song For The City</h2>
         <p>Nom du contrat : {this.state.contractName}</p>
         <p>Nombre total de tokens : {this.state.totalNumberToken}</p>
-        <Avatar alt="Remy Sharp" src={this.state.nft.url} />
+        <img alt="song in the city" src={this.state.nft.url} style={{height: "200px", width: "200px"}}/>
+        <br></br>
         <Button variant="contained" color="primary" onClick={() => this.creditToken()}>GET TOKEN</Button>
         <p>Hash : {this.state.token.txHash}</p>
         <p>Confirmations : {this.state.token.confirmationNumber}</p>

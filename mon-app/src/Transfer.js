@@ -24,10 +24,6 @@ class App extends Component {
 
   async handleTransfer(e) {
         e.preventDefault()
-        console.log('submited')
-        console.log('contract name :',this.state.contractName)
-        console.log(e.target.receiver.value)
-        console.log(e.target.tokenId.value)
         this.setState({receiver: e.target.receiver.value})
         this.setState({tokenId: e.target.tokenId.value})
         if (this.state.contractName !== 'Tout Doucement' && this.state.contractName !== 'Song for the City') {
@@ -35,21 +31,17 @@ class App extends Component {
             return
         }
         const currentContract  = await this.loadContract(this.state.contractName)
-        console.log('current contract :',currentContract)
-        console.log('address : ',this.props.address[0])
         currentContract.methods.safeTransferFrom(this.props.address[0], this.state.receiver, this.state.tokenId).send({from: this.props.address[0]})
     }
 
     async loadContract(contractName) {
         let instance;
-        console.log('loadContract',contractName)
         if (contractName === 'Tout Doucement') {
             // Loading Tout Doucement contract
             instance = await new this.props.web3.eth.Contract(abiTD.abi, '0x89150a0325ecc830a2304a44de98551051b4f466')
             return instance
         }
         else if (contractName === 'Song for the City') {
-            console.log('goes in if song')
             // Loading Song For The City contract
             instance = await new this.props.web3.eth.Contract(abiSFTC.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
             return instance
@@ -62,11 +54,8 @@ class App extends Component {
 
 
   handleChange(e) {
-      console.log('value :',)
       let contract = e.target.value
-      console.log('in state :',this.state.contractName)
       this.setState({contractName: contract})
-      console.log('in state after setstate:',this.state.contractName)
   };
 
   render() {

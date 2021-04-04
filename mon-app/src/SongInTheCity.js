@@ -16,14 +16,11 @@ class SongInTheCity extends Component {
   async componentWillMount() {
       const instance = await new this.props.web3.eth.Contract(abi.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
       this.setState({contract: instance})
-      console.log('song in the city instance : ',instance)
       this.infosFromContract(this.state.contract)
 
   }
 
   async componentDidMount() {
-    console.log('address in did mount arr : ', this.props.address)
-    console.log('address in did mount : ', this.props.address[0])
     await this.displayToken();
 
   }
@@ -36,17 +33,12 @@ class SongInTheCity extends Component {
       fetch('https://cors-anywhere.herokuapp.com/' + uri)
       .then(res => res.json())
       .then(data => {
-        console.log(data)
-        console.log(Object.keys(data.properties))
-        console.log(data.properties.image.description)
         this.setState({ nft: {url: data.properties.image.description, name: data.properties.name.description, description: data.properties.description.description} });
       })
     })
   }
 
   async creditToken(){
-    console.log(this.props.address)
-    console.log()
     //this.props.web3.eth.defaultAccount = this.props.web3.eth.accounts[0]; // = this.props.address  ou  web3.eth.accounts[0] ???
     //console.log(this.props.web3.eth.accounts[0])   is undefined ='(
     this.state.contract.methods.claimAToken().send({from : this.props.address[0]})
@@ -55,22 +47,17 @@ class SongInTheCity extends Component {
     }.bind(this))
     .on('confirmation', function(confirmationNumber, receipt) {
       this.setState({token: {confirmationNumber: confirmationNumber}})
-      console.log(confirmationNumber)
     }.bind(this))
     .on('receipt', function(receipt){
-        console.log(receipt);
     })
   }
 
   async displayToken(){
     const instance = await new this.props.web3.eth.Contract(abi.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
-    console.log('indisplay token :',instance)
     let nbTokens = await instance.methods.balanceOf(this.props.address[0]).call()
-    console.log(nbTokens)
     let tid = undefined
     for (var i = 0; i < nbTokens; i++) {
       tid = await this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i).call()
-      console.log(tid)
       this.setState({ tokensOwned: [...this.state.tokensOwned, await this.displayInfos(tid)] })
       //this.state.tokensOwned.push(this.displayInfos(this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i)));
       //this.setState({tokensOwned: [...this.state.tokensOwned, this.displayInfos(i)]})
@@ -82,11 +69,9 @@ class SongInTheCity extends Component {
     this.state.tokensOwned.forEach(elt => {
       this.setState({ tileData: [...this.state.tileData, {img: elt.img, title: elt.name, author: elt.tokenId}]})
     })
-    console.log(this.state.tileData)
   }
 
   async displayInfos(tokenId){
-    console.log('TOKEN ID', tokenId)
     let img = ''
     let name = ''
     const instance = await new this.props.web3.eth.Contract(abi.abi, '0x004a84209a0021b8ff182ffd8bb874c53f65e90e')
@@ -95,7 +80,6 @@ class SongInTheCity extends Component {
       let promise = fetch('https://cors-anywhere.herokuapp.com/' + uri)
       .then(res => res.json())
       .then(data => {
-        console.log(data.properties.name.description)
         img = data.properties.image.description
         name = data.properties.name.description
         const token = {tokenId, name, img}

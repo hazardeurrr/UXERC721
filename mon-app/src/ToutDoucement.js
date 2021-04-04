@@ -13,23 +13,17 @@ class ToutDoucement extends Component {
   async componentWillMount() {
       const instance = await new this.props.web3.eth.Contract(abi.abi, '0x89150a0325ecc830a2304a44de98551051b4f466')
       this.setState({contract: instance})
-      console.log(instance)
   }
 
   async buyToken(){
-    console.log(this.props.address)
-   // this.props.web3.eth.defaultAccount = '0xcd4528Edc220b5a7c7DDd7873FA692f486636E31'; // = this.props.address
-    // gasValue = this.state.contract.methods.buyAToken.estimateGas(...)
     this.state.contract.methods.buyAToken().send({from: this.props.address[0], gas: 500000, gasPrice: '50000000000', value: 100000000000000101})
     .on('transactionHash', function(hash){
       this.setState({token: {txHash: hash}})
     }.bind(this))
     .on('confirmation', function(confirmationNumber, receipt) {
       this.setState({token: {confirmationNumber: confirmationNumber}})
-      console.log(confirmationNumber)
     }.bind(this))
     .on('receipt', function(receipt){
-        console.log(receipt);
     }) // methods. ???
   }
 
@@ -39,13 +33,10 @@ class ToutDoucement extends Component {
 
   async displayToken(){
     const instance = await new this.props.web3.eth.Contract(abi.abi, '0x89150a0325ecc830a2304a44de98551051b4f466')
-    console.log('indisplay token :',instance)
     let nbTokens = await instance.methods.balanceOf(this.props.address[0]).call()
-    console.log(nbTokens)
     let tid = undefined
     for (var i = 0; i < nbTokens; i++) {
       tid = await this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i).call()
-      console.log(tid)
       this.setState({ tokensOwned: [...this.state.tokensOwned, await this.displayInfos(tid)] })
       //this.state.tokensOwned.push(this.displayInfos(this.state.contract.methods.tokenOfOwnerByIndex(this.props.address[0], i)));
       //this.setState({tokensOwned: [...this.state.tokensOwned, this.displayInfos(i)]})
@@ -57,11 +48,9 @@ class ToutDoucement extends Component {
     this.state.tokensOwned.forEach(elt => {
       this.setState({ tileData: [...this.state.tileData, {img: elt.img, title: elt.name, author: elt.tokenId}]})
     })
-    console.log("Tout doucement TileData : " + this.state.tileData)
   }
 
   async displayInfos(tokenId){
-    console.log('TOKEN ID', tokenId)
     let img = ''
     let name = ''
     const instance = await new this.props.web3.eth.Contract(abi.abi, '0x89150a0325ecc830a2304a44de98551051b4f466')
@@ -70,7 +59,6 @@ class ToutDoucement extends Component {
       let promise = fetch('https://cors-anywhere.herokuapp.com/' + uri)
       .then(res => res.json())
       .then(data => {
-        console.log(data.properties.name.description)
         img = data.properties.image.description
         name = data.properties.name.description
         const token = {tokenId, name, img}

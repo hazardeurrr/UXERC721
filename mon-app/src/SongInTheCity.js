@@ -102,8 +102,8 @@ class SongInTheCity extends Component {
         <img alt="song in the city" src={this.state.nft.url} style={{height: "200px", width: "200px"}}/>
         <br></br>
         <Button variant="contained" color="primary" onClick={() => this.creditToken()}>GET TOKEN</Button>
-        <p>Hash : {this.state.token.txHash}</p>
-        <p>Confirmations : {this.state.token.confirmationNumber}</p>
+        <p>Tx Hash : {this.state.token.txHash}</p>
+        <p>Block Confirmations : {this.state.token.confirmationNumber}</p>
       </Card>
       <TokenGrid tileData={this.state.tileData}></TokenGrid>
       </div>

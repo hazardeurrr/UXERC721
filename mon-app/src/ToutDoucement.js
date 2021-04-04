@@ -79,8 +79,8 @@ class ToutDoucement extends Component {
         <h2>Tout Doucement</h2>        
         {/* <img alt="song in the city" src={this.state.nft.url} style={{height: "200px", width: "200px"}}/> */}
         <Button variant="contained" color="primary" onClick={() => this.buyToken()}>BUY TOKEN (0.1ETH)</Button>
-        <p>Hash : {this.state.token.txHash}</p>
-        <p>Confirmations : {this.state.token.confirmationNumber}</p>
+        <p>Tx Hash : {this.state.token.txHash}</p>
+        <p>Blocks Confirmations : {this.state.token.confirmationNumber}</p>
         </Card>
         <TokenGrid tileData={this.state.tileData}></TokenGrid>
       </div>
